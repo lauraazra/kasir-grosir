@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
 import Product from "./models/Product.js";
 
-dotenv.config();
+// Cari file .env baik saat dijalankan dari folder root maupun dari folder /api
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 
 const dummyProducts = [
   {
@@ -50,12 +53,19 @@ const dummyProducts = [
 
 const seedDB = async () => {
   try {
-    await mongoose.connect(
-      process.env.MONGO_URI || "mongodb://127.0.0.1:27017/kasir_grosir",
-    );
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
+
+    if (!mongoUri) {
+      throw new Error("MONGODB_URI tidak ditemukan di file .env!");
+    }
+
+    await mongoose.connect(mongoUri);
+    console.log("Terhubung ke MongoDB Atlas...");
+
     await Product.deleteMany({});
     await Product.insertMany(dummyProducts);
-    console.log("Data dummy berhasil dimasukkan ke MongoDB!");
+
+    console.log("Data dummy berhasil dimasukkan ke MongoDB Atlas!");
     process.exit(0);
   } catch (error) {
     console.error("Gagal seeding data:", error);

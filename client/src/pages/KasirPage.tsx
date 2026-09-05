@@ -219,13 +219,13 @@ export default function KasirPage() {
     setCart((prev) => prev.filter((item) => item.cartId !== cartId));
   };
 
-  // Trigger tombol "Cetak / Simpan" 
+  // Trigger tombol "Cetak / Simpan"
   const handleOpenConfirmModal = () => {
     if (cart.length === 0) return;
     setIsConfirmModalOpen(true);
   };
 
-  // Eksekusi print & reset keranjang 
+  // Eksekusi print & reset keranjang
   const handleConfirmAndPrint = () => {
     setIsConfirmModalOpen(false);
     setTimeout(() => {
@@ -338,11 +338,7 @@ export default function KasirPage() {
         </div>
       )}
 
-      <ReceiptPrintTemplate
-        cart={cart}
-        grandTotal={grandTotal}
-        totalQty={totalQty}
-      />
+      <ReceiptPrintTemplate cart={cart} grandTotal={grandTotal} />
     </>
   );
 }

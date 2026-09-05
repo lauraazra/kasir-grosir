@@ -3,11 +3,10 @@ import type { ICartItem } from "../../types/kasir";
 interface Props {
   cart: ICartItem[];
   grandTotal: number;
-  totalQty: number;
 }
 const BLANK_LINE = " \n";
 
-export function ReceiptPrintTemplate({ cart, grandTotal, totalQty }: Props) {
+export function ReceiptPrintTemplate({ cart, grandTotal }: Props) {
   const currentDate = new Date().toLocaleDateString("id-ID", {
     year: "numeric",
     month: "2-digit",
@@ -44,12 +43,11 @@ export function ReceiptPrintTemplate({ cart, grandTotal, totalQty }: Props) {
       }}
     >
       {BLANK_LINE}
-      {BLANK_LINE}
 
       {/* Header Struk */}
       <div>{padCenter("S A M U D R A   K U E")}</div>
       <div>{padCenter("Jl. Hamara Effendi, No.262")}</div>
-      <div>{padCenter("0812345678")}</div>
+      <div>{padCenter("08112113931")}</div>
 
       <div>--------------------------------</div>
 
@@ -69,7 +67,6 @@ export function ReceiptPrintTemplate({ cart, grandTotal, totalQty }: Props) {
           <div key={item.cartId} style={{ marginBottom: "2px" }}>
             <div>{formatTwoColumns(itemLine, subtotalStr)}</div>
             <div>{qtyPrice}</div>
-            {BLANK_LINE}
           </div>
         );
       })}
@@ -77,7 +74,6 @@ export function ReceiptPrintTemplate({ cart, grandTotal, totalQty }: Props) {
       <div>--------------------------------</div>
 
       {/* Ringkasan */}
-      <div>{formatTwoColumns("Total QTY :", totalQty.toString())}</div>
       <div style={{ fontWeight: "bold" }}>
         {formatTwoColumns(
           "TOTAL     :",
@@ -88,11 +84,8 @@ export function ReceiptPrintTemplate({ cart, grandTotal, totalQty }: Props) {
       <div>--------------------------------</div>
 
       {/* Footer Struk */}
-      <div>{padCenter("Terima Kasih Atas Kunjungan Anda!")}</div>
-      <div>{padCenter("Barang yang sudah dibeli")}</div>
-      <div>{padCenter("tidak dapat ditukar/dikembalikan.")}</div>
+      <div>{padCenter("Terimakasih Atas Kunjungannya")}</div>
 
-      {BLANK_LINE}
       {BLANK_LINE}
       {BLANK_LINE}
       {BLANK_LINE}
