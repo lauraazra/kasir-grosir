@@ -42,8 +42,6 @@ export function ReceiptPrintTemplate({ cart, grandTotal }: Props) {
         width: "100%",
       }}
     >
-      {BLANK_LINE}
-
       {/* Header Struk */}
       <div>{padCenter("S A M U D R A   K U E")}</div>
       <div>{padCenter("Jl. Hamara Effendi, No.262")}</div>
