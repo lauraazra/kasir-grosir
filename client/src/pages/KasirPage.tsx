@@ -9,6 +9,7 @@ import { CartListMobile } from "../components/kasir/CartListMobile";
 import { KasirFooterBar } from "../components/kasir/KasirFooterBar";
 import { ReceiptPrintTemplate } from "../components/kasir/ReceiptPrintTemplate";
 import { AlertCircle } from "lucide-react";
+import { printViaBluetooth } from "../utils/kasir/bluetoothPrinter";
 
 export default function KasirPage() {
   const {
@@ -226,8 +227,21 @@ export default function KasirPage() {
   };
 
   // Eksekusi print & reset keranjang
-  const handleConfirmAndPrint = () => {
+  const handleConfirmAndPrint = async () => {
     setIsConfirmModalOpen(false);
+
+    // 1. Cek apakah dijalankan di Mobile yang memiliki Web Bluetooth (Android Chrome / iOS Bluefy)
+    if ("bluetooth" in navigator) {
+      try {
+        await printViaBluetooth(cart, grandTotal);
+        setCart([]); // Reset keranjang setelah berhasil cetak
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak Bluetooth, beralih ke window.print():", err);
+      }
+    }
+
+    // 2. Fallback untuk Windows/Desktop (Menggunakan window.print() + --kiosk-printing)
     setTimeout(() => {
       window.print();
       setCart([]);
