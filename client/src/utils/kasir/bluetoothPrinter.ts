@@ -89,8 +89,7 @@ export async function printViaBluetooth(
     commands.push(0x1b, 0x40);
     // Encode Teks Struk
     commands.push(...encoder.encode(receiptText));
-    // Auto Cut / Feed Kertas (GS V 66 0 + Feeds tambahan)
-    // commands.push(0x0a, 0x0a, 0x1d, 0x56, 66, 0);
+    commands.push(0x0a, 0x1b, 0x64, 2);
 
     const dataUint8 = new Uint8Array(commands);
 
