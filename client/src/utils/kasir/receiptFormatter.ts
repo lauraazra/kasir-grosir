@@ -51,7 +51,7 @@ export function generateReceiptText(
       `Rp ${grandTotal.toLocaleString("id-ID")}`,
     ) + "\n";
   text += "--------------------------------\n";
-  text += padCenter("Terimakasih Atas Kunjungannya") + "\n\n";
+  text += padCenter("Terimakasih Atas Kunjungannya") + "\n";
 
   return text;
 }
