@@ -1,4 +1,4 @@
-import type { IUnitOption } from "../types/kasir";
+import type { IUnitOption } from "../../types/kasir";
 
 export function calculateTieredPrice(
   availableUnits: IUnitOption[],

@@ -1,4 +1,4 @@
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, Minus } from "lucide-react";
 import type { IProduct } from "../../types/kasir";
 
 interface Props {
@@ -7,6 +7,8 @@ interface Props {
   filteredProducts: IProduct[];
   selectedIndex: number;
   selectedProduct: IProduct | null;
+  qty: number;
+  onQtyChange: (newQty: number) => void;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   onFocus: () => void;
@@ -21,6 +23,8 @@ export function ProductSearchInput({
   filteredProducts,
   selectedIndex,
   selectedProduct,
+  qty,
+  onQtyChange,
   onSearchChange,
   onKeyDown,
   onFocus,
@@ -30,6 +34,35 @@ export function ProductSearchInput({
 }: Props) {
   return (
     <div className="flex gap-2 relative">
+      {/* INPUT QTY (+ & -) */}
+      <div className="flex items-center border border-gray-300 bg-white rounded-xl shadow-xs overflow-hidden">
+        <button
+          type="button"
+          onClick={() => onQtyChange(Math.max(1, qty - 1))}
+          className="p-2 text-gray-500 hover:bg-slate-100 transition cursor-pointer"
+        >
+          <Minus size={14} />
+        </button>
+        <input
+          type="number"
+          min={1}
+          value={qty}
+          onFocus={(e) => e.target.select()}
+          onChange={(e) =>
+            onQtyChange(Math.max(1, parseInt(e.target.value) || 1))
+          }
+          className="w-7 text-center font-semibold text-slate-800 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        />
+        <button
+          type="button"
+          onClick={() => onQtyChange(qty + 1)}
+          className="p-2 text-gray-500 hover:bg-slate-100 transition cursor-pointer"
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+
+      {/* INPUT SEARCH BARANG */}
       <div className="relative flex-1">
         <input
           type="text"
@@ -71,13 +104,14 @@ export function ProductSearchInput({
         )}
       </div>
 
+      {/* TOMBOL TAMBAH KE KERANJANG */}
       <button
+        type="button"
         onClick={onAddToCart}
         disabled={!selectedProduct}
-        className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 font-semibold px-5 py-3 rounded-xl shadow-xs transition cursor-pointer"
+        className="flex items-center justify-center bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 font-semibold px-5 py-3 rounded-xl shadow-xs transition cursor-pointer"
       >
         <Plus size={20} />
-        <span>Tambah</span>
       </button>
     </div>
   );

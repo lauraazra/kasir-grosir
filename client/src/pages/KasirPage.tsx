@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useFetchData } from "../useFetchData";
 import type { IProduct, ICartItem } from "../types/kasir";
-import { calculateTieredPrice } from "../utils/tieredPriceCalculator";
+import { calculateTieredPrice } from "../utils/kasir/tieredPriceCalculator";
 
 import { ProductSearchInput } from "../components/kasir/ProductSearchInput";
 import { CartTableDesktop } from "../components/kasir/CartTableDesktop";
@@ -21,6 +21,7 @@ export default function KasirPage() {
   const [cart, setCart] = useState<ICartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [inputQty, setInputQty] = useState<number>(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
@@ -53,6 +54,7 @@ export default function KasirPage() {
   const addProductToCart = (product: IProduct) => {
     if (!product || product.units.length === 0) return;
     const defaultUnit = product.units[0];
+    const qtyToAdd = inputQty > 0 ? inputQty : 1; // Pakai Qty dari input form
 
     setCart((prev) => {
       const existingIndex = prev.findIndex(
@@ -64,7 +66,7 @@ export default function KasirPage() {
       if (existingIndex > -1) {
         const updatedCart = [...prev];
         const item = updatedCart[existingIndex];
-        const newQty = item.qty + 1;
+        const newQty = item.qty + qtyToAdd;
 
         const calc = calculateTieredPrice(
           item.availableUnits,
@@ -81,21 +83,29 @@ export default function KasirPage() {
         return updatedCart;
       }
 
+      const calc = calculateTieredPrice(
+        product.units,
+        defaultUnit.unitName,
+        qtyToAdd,
+      );
+
       const newItem: ICartItem = {
         cartId: `${product._id}-${defaultUnit.unitName}-${Date.now()}`,
         productId: product._id,
         name: product.name,
-        qty: 1,
+        qty: qtyToAdd,
         selectedUnit: defaultUnit,
         availableUnits: product.units,
-        price: defaultUnit.price,
-        subtotal: defaultUnit.price * 1,
+        price: calc.price,
+        subtotal: calc.subtotal,
       };
       return [...prev, newItem];
     });
 
+    // Reset input setelah berhasil ditambahkan ke keranjang
     setSelectedProduct(null);
     setSearchTerm("");
+    setInputQty(1); // Reset Qty kembali ke 1
     setIsDropdownOpen(false);
     setSelectedIndex(-1);
   };
@@ -271,8 +281,8 @@ export default function KasirPage() {
 
   return (
     <>
-      <div className="flex flex-col h-[calc(100vh-5rem)] justify-between gap-4 print:hidden">
-        <div className="space-y-4">
+      <div className="flex flex-col h-[calc(100vh-5rem)] lg:h-[calc(100vh-3rem)] gap-4 print:hidden overflow-hidden">
+        <div className="flex-none space-y-4 pt-2">
           <h1 className="text-2xl font-bold text-slate-900">Kasir Toko</h1>
           <ProductSearchInput
             searchTerm={searchTerm}
@@ -280,6 +290,8 @@ export default function KasirPage() {
             filteredProducts={filteredProducts}
             selectedIndex={selectedIndex}
             selectedProduct={selectedProduct}
+            qty={inputQty}
+            onQtyChange={setInputQty}
             onSearchChange={handleSearchChange}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsDropdownOpen(true)}
@@ -289,34 +301,38 @@ export default function KasirPage() {
           />
         </div>
 
-        {/* Tabel Desktop View */}
-        <CartTableDesktop
-          cart={cart}
-          onQtyChange={handleQtyChange}
-          onUnitChange={handleUnitChange}
-          onSubtotalChange={handleSubtotalChange}
-          onSubtotalBlur={handleSubtotalBlur}
-          onRemoveItem={handleRemoveItem}
-        />
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {/* Tabel Desktop View */}
+          <CartTableDesktop
+            cart={cart}
+            onQtyChange={handleQtyChange}
+            onUnitChange={handleUnitChange}
+            onSubtotalChange={handleSubtotalChange}
+            onSubtotalBlur={handleSubtotalBlur}
+            onRemoveItem={handleRemoveItem}
+          />
 
-        {/* List Mobile View */}
-        <CartListMobile
-          cart={cart}
-          onQtyChange={handleQtyChange}
-          onUnitChange={handleUnitChange}
-          onSubtotalChange={handleSubtotalChange}
-          onSubtotalBlur={handleSubtotalBlur}
-          onRemoveItem={handleRemoveItem}
-        />
+          {/* List Mobile View */}
+          <CartListMobile
+            cart={cart}
+            onQtyChange={handleQtyChange}
+            onUnitChange={handleUnitChange}
+            onSubtotalChange={handleSubtotalChange}
+            onSubtotalBlur={handleSubtotalBlur}
+            onRemoveItem={handleRemoveItem}
+          />
+        </div>
 
-        {/* Footer Info & Action */}
-        <KasirFooterBar
-          grandTotal={grandTotal}
-          totalItems={totalItems}
-          totalQty={totalQty}
-          onPrintAndSave={handleOpenConfirmModal}
-          isCartEmpty={cart.length === 0}
-        />
+        <div className="flex-none">
+          {/* Footer Info & Action */}
+          <KasirFooterBar
+            grandTotal={grandTotal}
+            totalItems={totalItems}
+            totalQty={totalQty}
+            onPrintAndSave={handleOpenConfirmModal}
+            isCartEmpty={cart.length === 0}
+          />
+        </div>
       </div>
 
       {/* MODAL KONFIRMASI AKHIR TRANSAKSI */}
